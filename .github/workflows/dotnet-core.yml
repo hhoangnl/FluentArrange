@@ -1,0 +1,198 @@
+name: Build, Test and Release
+
+env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    NUGET_URL: https://api.nuget.org/v3/index.json
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    outputs:
+      #
+      fluentarrange_version: ${{ steps.extract-fluentarrange-info.outputs.version }}
+      fluentarrange_prerelease: ${{ steps.extract-fluentarrange-info.outputs.prerelease }}
+      fluentarrange_nupkg: ${{ steps.extract-fluentarrange-info.outputs.nupkg }}
+      #
+      fluentarrange_nsubstitute_version: ${{ steps.extract-fluentarrange-nsubstitute-info.outputs.version }}
+      fluentarrange_nsubstitute_prerelease: ${{ steps.extract-fluentarrange-nsubstitute-info.outputs.prerelease }}
+      fluentarrange_nsubstitute_nupkg: ${{ steps.extract-fluentarrange-nsubstitute-info.outputs.nupkg }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Create NuGet package artifact
+      shell: pwsh
+      run: |
+        dotnet pack .\FluentArrange\FluentArrange.csproj -o .
+        dotnet pack .\FluentArrange.NSubstitute\FluentArrange.NSubstitute.csproj -o .
+        echo ${{ github.ref }}
+        echo ${{ github.event_name }}
+        
+    - name: Extract Info (FluentArrange)
+      id: extract-fluentarrange-info
+      shell: pwsh
+      run: |
+        $file = (Get-Item "*FluentArrange.*.nupkg")[0]
+        $fileName = $file.Name
+        $version = $file.Basename.Replace("FluentArrange.", "")
+        $prerelease = ($version.Contains("alpha") -or $version.Contains("beta") -or $version.Contains("preview")).ToString().ToLower()
+        echo "::set-output name=version::$version"
+        echo "::set-output name=prerelease::$prerelease"
+        echo "::set-output name=nupkg::$fileName"
+
+    - name: Extract Info (FluentArrange.NSubstitute)
+      id: extract-fluentarrange-nsubstitute-info
+      shell: pwsh
+      run: |
+        $file = (Get-Item "*FluentArrange.NSubstitute.*.nupkg")[0]
+        $fileName = $file.Name
+        $version = $file.Basename.Replace("FluentArrange.NSubstitute.", "")
+        $prerelease = ($version.Contains("alpha") -or $version.Contains("beta") -or $version.Contains("preview")).ToString().ToLower()
+        echo "::set-output name=version::$version"
+        echo "::set-output name=prerelease::$prerelease"
+        echo "::set-output name=nupkg::$fileName"
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        name: artifact
+        path: ./*.nupkg
+        if-no-files-found: error
+        retention-days: 90
+
+  predeploy:
+    name: Pre-Deployment
+    needs: [build]
+    if: success() && github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+
+    steps:
+    - name: Generate changelog
+      id: changelog
+      uses: heinrichreimer/action-github-changelog-generator@v2.1.1
+      with:
+        token: ${{ secrets.GITHUB }}
+        verbose: true
+
+  deploy_fluentarrange:
+    name: Create Release (FluentArrange)
+    runs-on: windows-latest
+    needs: [build, predeploy]
+
+    steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v2.0.5
+      with:
+        name: artifact
+
+    - name: Create a Release (FluentArrange)
+      id: create-release-fluentarrange
+      uses: actions/create-release@v1.1.4
+      with:
+        tag_name: ${{ needs.build.outputs.fluentarrange_version }}
+        release_name: Release ${{ needs.build.outputs.fluentarrange_version }}
+        body: ${{ needs.predeploy.outputs.changelog }}
+        draft: false
+        prerelease: ${{ needs.build.outputs.fluentarrange_prerelease }}
+
+    - name: Upload a Release Asset
+      uses: actions/upload-release-asset@v1.0.2
+      with:
+        upload_url: ${{ steps.create-release-fluentarrange.outputs.upload_url }}
+        asset_path: ${{ needs.build.outputs.fluentarrange_nupkg }}
+        asset_name: ${{ needs.build.outputs.fluentarrange_nupkg }}
+        asset_content_type: application/octet-stream
+
+  deploy_fluentarrange_nuget:
+    name: Upload To NuGet (FluentArrange)
+    runs-on: windows-latest
+    needs: [build, predeploy]
+
+    steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v2.0.5
+      with:
+        name: artifact
+
+    - name: Setup NuGet.exe for use with actions
+      uses: NuGet/setup-nuget@v1.0.2
+      with:
+        nuget-version: latest
+
+    - name: Upload to NuGet
+      shell: pwsh
+      run: |
+        nuget push ${{ needs.build.outputs.fluentarrange_nupkg }} -Source ${{ env.nuget_url }} -ApiKey ${{ secrets.NUGET }}
+
+  deploy_fluentarrange_nsubstitute:
+    name: Create Release (FluentArrange.NSubstitute)
+    runs-on: windows-latest
+    needs: [build, predeploy]
+
+    steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v2.0.5
+      with:
+        name: artifact
+
+    - name: Create a Release (FluentArrange.NSubstitute)
+      id: create-release-fluentarrange-nsubstitute
+      uses: actions/create-release@v1.1.4
+      with:
+        tag_name: ${{ needs.build.outputs.fluentarrange_nsubstitute_version }}
+        release_name: Release ${{ needs.build.outputs.fluentarrange_nsubstitute_version }}
+        body: ${{ needs.predeploy.outputs.changelog }}
+        draft: false
+        prerelease: ${{ needs.build.outputs.fluentarrange_nsubstitute_prerelease }}
+
+    - name: Upload a Release Asset
+      uses: actions/upload-release-asset@v1.0.2
+      with:
+        upload_url: ${{ steps.create-release-fluentarrange-nsubstitute.outputs.upload_url }}
+        asset_path: ${{ needs.build.outputs.fluentarrange_nsubstitute_nupkg }}
+        asset_name: ${{ needs.build.outputs.fluentarrange_nsubstitute_nupkg }}
+        asset_content_type: application/octet-stream
+
+  deploy_fluentarrange_nsubstitute_nuget:
+    name: Upload To NuGet (FluentArrange.NSubstitute)
+    runs-on: windows-latest
+    needs: [build, predeploy]
+
+    steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v2.0.5
+      with:
+        name: artifact
+
+    - name: Setup NuGet.exe for use with actions
+      uses: NuGet/setup-nuget@v1.0.2
+      with:
+        nuget-version: latest
+
+    - name: Upload to NuGet
+      shell: pwsh
+      run: |
+        nuget push ${{ needs.build.outputs.fluentarrange_nsubstitute_nupkg }} -Source ${{ env.nuget_url }} -ApiKey ${{ secrets.NUGET }}

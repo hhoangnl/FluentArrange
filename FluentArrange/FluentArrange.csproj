@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Version>0.0.1-alpha</Version>
+    <Description>Write clean Arrange code using Fluent syntax.</Description>
+    <PackageProjectUrl>https://github.com/FluentArrange</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FluentArrange/FluentArrange</RepositoryUrl>
+    <PackageReleaseNotes>Initial version</PackageReleaseNotes>
+    <PackageTags>AAA TDD mocking unit-testing</PackageTags>
+    <Authors>Huy Hoang</Authors>
+    <Copyright>Huy Hoang</Copyright>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>FluentArrange.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,10 @@
+﻿<SolutionConfiguration>
+  <Settings>
+    <AllowParallelTestExecution>True</AllowParallelTestExecution>
+    <MetricsExclusionList>
+      <Value>FluentArrange.Tests\FluentArrange.Tests.csproj</Value>
+      <Value>FluentArrange.NSubstitute.Tests\FluentArrange.NSubstitute.Tests.csproj</Value>
+    </MetricsExclusionList>
+    <SolutionConfigured>True</SolutionConfigured>
+  </Settings>
+</SolutionConfiguration>
