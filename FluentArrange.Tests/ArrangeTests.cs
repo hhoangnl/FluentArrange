@@ -8,13 +8,13 @@ using Xunit;
 
 namespace FluentArrange.Tests
 {
-    public class FluentTests
+    public class ArrangeTests
     {
         [Fact]
         public void Arrange_MultipleCtorsFound_ShouldThrowInvalidOperationException()
         {
             // Act
-            Action act = () => Fluent.Arrange<MultipleCtor>(type => new object());
+            Action act = () => Arrange.For<MultipleCtor>(type => new object());
 
             // Assert
             act.Should().Throw<InvalidOperationException>();
@@ -24,7 +24,7 @@ namespace FluentArrange.Tests
         public void Arrange_ParameterlessCtor_ShouldNotHaveAnyDependencies()
         {
             // Act
-            var result = Fluent.Arrange<AccountRepository>(type => new object());
+            var result = Arrange.For<AccountRepository>(type => new object());
 
             // Assert
             result.Dependencies.Should().BeEmpty();
@@ -37,7 +37,7 @@ namespace FluentArrange.Tests
             var dependency = new AccountRepository();
 
             // Act
-            var result = Fluent.Arrange<AccountService>(type => dependency);
+            var result = Arrange.For<AccountService>(type => dependency);
 
             // Assert
             result.Dependencies.Values.Should().SatisfyRespectively(first => first.Should().Be(dependency));

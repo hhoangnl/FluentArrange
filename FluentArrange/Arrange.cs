@@ -7,15 +7,15 @@ using System.Linq;
 
 namespace FluentArrange
 {
-    public static class Fluent
+    public static class Arrange
     {
         /// <summary>
         /// Construct a class of type {T} and inject it with mocked dependencies.
         /// </summary>
         /// <typeparam name="T">Type of the concrete class</typeparam>
         /// <param name="createMockType">The method to create mocked dependencies</param>
-        /// <returns></returns>
-        public static FluentArrangeObject<T> Arrange<T>(Func<Type, object> createMockType)
+        /// <returns>An instance of {T}</returns>
+        public static FluentArrangeContext<T> For<T>(Func<Type, object> createMockType)
             where T : class
         {
             var constructor = typeof(T).GetConstructors().Single();
@@ -28,7 +28,13 @@ namespace FluentArrange
                 listOfDependencies.Add(p.ParameterType, dependency);
             }
 
-            return new FluentArrangeObject<T>(listOfDependencies);
+            return new FluentArrangeContext<T>(listOfDependencies);
+        }
+
+        public static T Sut<T>(Func<Type, object> createMockType)
+            where T : class
+        {
+            return For<T>(createMockType).BuildSut();
         }
     }
 }

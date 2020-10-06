@@ -8,17 +8,21 @@ using System.Linq;
 
 namespace FluentArrange
 {
-    public class FluentArrangeObject<T>
+    public class FluentArrangeContext<T>
         where T : class
     {
         internal readonly IReadOnlyDictionary<Type, object> Dependencies;
 
-        internal FluentArrangeObject(IDictionary<Type, object> dependencies)
+        internal FluentArrangeContext(IDictionary<Type, object> dependencies)
         {
             Dependencies = new ReadOnlyDictionary<Type, object>(dependencies);
         }
 
-        public FluentArrangeObject<T> WithDependency<T2>(Action<T2> configureDependency) where T2 : class
+        private T? _sut;
+
+        public T Sut => _sut ??= BuildSut();
+
+        public FluentArrangeContext<T> WithDependency<T2>(Action<T2> configureDependency) where T2 : class
         {
             if (Dependencies.TryGetValue(typeof(T2), out var value) && value is T2 dependency)
             {
