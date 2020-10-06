@@ -32,6 +32,16 @@ namespace FluentArrange
             return this;
         }
 
+        public T2 Dependency<T2>() where T2 : class
+        {
+            if (Dependencies.TryGetValue(typeof(T2), out var value) && value is T2 dependency)
+            {
+                return dependency;
+            }
+
+            throw new InvalidOperationException($"No dependency found of type {typeof(T2)}");
+        }
+
         public T BuildSut()
         {
             return (T) Activator
