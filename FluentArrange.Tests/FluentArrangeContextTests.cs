@@ -9,14 +9,14 @@ using Xunit;
 
 namespace FluentArrange.Tests
 {
-    public class FluentArrangeObjectTests
+    public class FluentArrangeContextTests
     {
         [Fact]
         public void WithDependency_DependencyTypeNotFound_ShouldNotCallConfigureDependency()
         {
             // Arrange
             var called = false;
-            var sut = new FluentArrangeObject<object>(new Dictionary<Type, object>());
+            var sut = new FluentArrangeContext<object>(new Dictionary<Type, object>());
 
             // Act
             sut.WithDependency<IAccountRepository>(e => called = true);
@@ -34,7 +34,7 @@ namespace FluentArrange.Tests
             {
                 {typeof(IAccountRepository), new AccountRepository()}
             };
-            var sut = new FluentArrangeObject<AccountService>(dependencies);
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
 
             // Act
             sut.WithDependency<IAccountRepository>(e => called = true);
@@ -47,7 +47,7 @@ namespace FluentArrange.Tests
         public void WithDependency_ShouldReturnReferenceToSut()
         {
             // Arrange
-            var sut = new FluentArrangeObject<AccountService>(new Dictionary<Type, object>());
+            var sut = new FluentArrangeContext<AccountService>(new Dictionary<Type, object>());
 
             // Act
             var result = sut.WithDependency<IAccountRepository>(e => { });
@@ -66,7 +66,7 @@ namespace FluentArrange.Tests
                 {typeof(IAccountRepository), dependency}
             };
 
-            var sut = new FluentArrangeObject<AccountService>(dependencies)
+            var sut = new FluentArrangeContext<AccountService>(dependencies)
                 .WithDependency<IAccountRepository>(e => { });
 
             // Act
