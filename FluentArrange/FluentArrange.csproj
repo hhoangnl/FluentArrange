@@ -3,11 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>0.1.1-alpha</Version>
+    <Version>0.2.0-alpha</Version>
     <Description>Write clean Arrange code using Fluent syntax.</Description>
-    <PackageProjectUrl>https://github.com/FluentArrange</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/hhoangnl/FluentArrange</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hhoangnl/FluentArrange</RepositoryUrl>
-    <PackageReleaseNotes>Refactored naming, added .Sut&lt;T&gt; method to get the sut directly, added .Dependency&lt;T&gt; to get the mocked dependencies</PackageReleaseNotes>
+    <PackageReleaseNotes>Added overloads to accept instances:
+- WithDependency&lt;T&gt;(T)
+- WithDependency&lt;T&gt;(T, Action&lt;T&gt;)</PackageReleaseNotes>
     <PackageTags>AAA TDD mocking unit-testing</PackageTags>
     <Authors>Huy Hoang</Authors>
     <Copyright>Huy Hoang</Copyright>

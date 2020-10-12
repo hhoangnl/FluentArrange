@@ -75,5 +75,44 @@ namespace FluentArrange.Tests
             // Assert
             result.AccountRepository.Should().Be(dependency);
         }
+
+        [Fact]
+        public void WithDependency_Instance_DependenciesShouldContainInstance()
+        {
+            // Arrange
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+            var newInstance = new AccountRepository();
+
+            // Act
+            sut.WithDependency<IAccountRepository>(newInstance);
+
+            // Assert
+            sut.Dependencies[typeof(IAccountRepository)].Should().Be(newInstance);
+        }
+
+        [Fact]
+        public void WithDependency_Instance_TypeNotFound_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+            // Act
+            Action act = () => sut.WithDependency<IFoo>(new Foo());
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+                .And.Message.Should().Be("No dependency found of type FluentArrange.Tests.TestClasses.IFoo");
+        }
     }
 }
