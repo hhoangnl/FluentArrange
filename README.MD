@@ -5,7 +5,7 @@ FluentArrange lets you write clean Arrange blocks in your unit tests when the co
 | Package                     | Version | Description                                                             |
 |-----------------------------|---------|-------------------------------------------------------------------------|
 | `FluentArrange`             | [![Nuget version](https://img.shields.io/nuget/v/fluentarrange)](https://www.nuget.org/packages/fluentarrange) | Core package
-| `FluentArrange.NSubstitute` | [![Nuget version](https://img.shields.io/nuget/v/fluentarrange.nsubstitute)](https://www.nuget.org/packages/fluentarrange.nsubstitute) | When you use [NSubstitute](https://github.com/nsubstitute/NSubstitute) as the mocking framework
+| `FluentArrange.NSubstitute` | [![Nuget version](https://img.shields.io/nuget/v/fluentarrange.nsubstitute)](https://www.nuget.org/packages/fluentarrange.nsubstitute) | When you use [NSubstitute](https://github.com/nsubstitute/NSubstitute) for mocking
 
 ## Auto-Mocking Ctor Dependencies
 Consider the following example where we use NSubstitute to mock dependencies:
@@ -38,11 +38,34 @@ var sut = new ResetPasswordController(
     mailService);
 ~~~
 
-With FluentArrange, you can use Fluent API to achieve the exact same result as the code above:
+With FluentArrange, you can use the Fluent API `WithDependency<T>` to achieve the exact same result as the code above:
 ~~~ C#
 var sut = Arrange.Sut<ResetPasswordController>()
     .WithDependency<IAccountService>(x => x.FindEmail("foo@foo.com").Returns(new Account("foo")))
     .WithDependency<IMailService>(x => x.SendMail("foo@foo.com").Returns(true));
+~~~
+
+As you might have noticed, we did not need write arrange code for `IAuditService`, as that will be automatically created for you.
+The only time you need to call `WithDependency<T>` is when you need to arrange the behavior of type `T`.
+
+## Passing an instance instead
+Sometimes, you may want to use a fake implementation rather than letting FluentArrange automatically create mocked instances.
+
+In that case, you can provide an instance using `WithDependency<T>(T)`:
+
+~~~ C#
+var context = Arrange.Sut<ResetPasswordController>()
+    .WithDependency<IAccountService>(new InMemoryAccountService());
+~~~
+
+or `WithDependency<T>(T, Action<T>)` if you need to do more arranging:
+~~~ C#
+var context = Arrange.Sut<ResetPasswordController>()
+    .WithDependency<IAccountService>(new InMemoryAccountService(), d =>
+    {
+        d.AddAccount("foo", "foo@foo.com");
+        d.AddAccount("foobar", "foobar@foo.com");
+    });
 ~~~
 
 ## Asserting Dependencies

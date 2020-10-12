@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace FluentArrange
@@ -11,11 +10,11 @@ namespace FluentArrange
     public class FluentArrangeContext<T>
         where T : class
     {
-        internal readonly IReadOnlyDictionary<Type, object> Dependencies;
+        internal readonly Dictionary<Type, object> Dependencies;
 
-        internal FluentArrangeContext(IDictionary<Type, object> dependencies)
+        internal FluentArrangeContext(Dictionary<Type, object> dependencies)
         {
-            Dependencies = new ReadOnlyDictionary<Type, object>(dependencies);
+            Dependencies = new Dictionary<Type, object>(dependencies);
         }
 
         private T? _sut;
@@ -28,6 +27,25 @@ namespace FluentArrange
             {
                 configureDependency.Invoke(dependency);
             }
+
+            return this;
+        }
+
+        public FluentArrangeContext<T> WithDependency<T2>(T2 instance) where T2 : class
+        {
+            _ = Dependency<T2>();
+
+            Dependencies[typeof(T2)] = instance;
+
+            return this;
+        }
+
+        public FluentArrangeContext<T> WithDependency<T2>(T2 instance, Action<T2> configureInstance) where T2 : class
+        {
+            _ = Dependency<T2>();
+
+            Dependencies[typeof(T2)] = instance;
+            configureInstance(instance);
 
             return this;
         }
