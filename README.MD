@@ -4,7 +4,7 @@
 
 <hr />
 
-**FluentArrange** lets you write clean Arrange blocks in your unit tests when the constructor of the _class under test_ has a lot of (mocked) dependencies.
+**FluentArrange** lets you write clean Arrange blocks in your unit tests _even_ when the constructor of the _class under test_ has a lot of (mocked) dependencies.
 
 ## Packages
 | Package                     | Version | Description                                                             |
@@ -50,7 +50,7 @@ var sut = Arrange.Sut<ResetPasswordController>()
     .WithDependency<IMailService>(x => x.SendMail("foo@foo.com").Returns(true));
 ~~~
 
-As you might have noticed, we did not need write arrange code for `IAuditService`, as that will be automatically created for you.
+As you might have noticed, we did not need to write arrange code for `IAuditService`, as that will be automatically created for you.
 The only time you need to call `WithDependency<T>` is when you need to arrange the behavior of type `T`.
 
 ## Passing an instance instead
