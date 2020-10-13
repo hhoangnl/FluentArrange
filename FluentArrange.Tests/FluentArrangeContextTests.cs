@@ -12,24 +12,24 @@ namespace FluentArrange.Tests
     public class FluentArrangeContextTests
     {
         [Fact]
-        public void WithDependency_DependencyTypeNotFound_ShouldNotCallConfigureDependency()
+        public void WithDependency_TypeNotFound_ShouldNotInvokeAction()
         {
             // Arrange
-            var called = false;
+            var invoked = false;
             var sut = new FluentArrangeContext<object>(new Dictionary<Type, object>());
 
             // Act
-            sut.WithDependency<IAccountRepository>(e => called = true);
+            sut.WithDependency<IAccountRepository>(e => invoked = true);
 
             // Assert
-            called.Should().BeFalse();
+            invoked.Should().BeFalse();
         }
 
         [Fact]
-        public void WithDependency_DependencyTypeFound_ShouldInvokeConfigureDependency()
+        public void WithDependency_TypeFound_ShouldInvokeAction()
         {
             // Arrange
-            var called = false;
+            var invoked = false;
             var dependencies = new Dictionary<Type, object>
             {
                 {typeof(IAccountRepository), new AccountRepository()}
@@ -37,14 +37,14 @@ namespace FluentArrange.Tests
             var sut = new FluentArrangeContext<AccountService>(dependencies);
 
             // Act
-            sut.WithDependency<IAccountRepository>(e => called = true);
+            sut.WithDependency<IAccountRepository>(e => invoked = true);
 
             // Assert
-            called.Should().BeTrue();
+            invoked.Should().BeTrue();
         }
 
         [Fact]
-        public void WithDependency_ShouldReturnReferenceToSut()
+        public void WithDependency_Type_ShouldReturnReferenceToSut()
         {
             // Arrange
             var sut = new FluentArrangeContext<AccountService>(new Dictionary<Type, object>());
@@ -54,6 +54,85 @@ namespace FluentArrange.Tests
 
             // Assert
             result.Should().Be(sut);
+        }
+
+        [Fact]
+        public void WithDependency_T_InstanceTypeFound_DependenciesShouldContainInstance()
+        {
+            // Arrange
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+            var newInstance = new AccountRepository();
+
+            // Act
+            sut.WithDependency<IAccountRepository>(newInstance);
+
+            // Assert
+            sut.Dependencies[typeof(IAccountRepository)].Should().Be(newInstance);
+        }
+
+        [Fact]
+        public void WithDependency_T_InstanceTypeNotFound_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+            // Act
+            Action act = () => sut.WithDependency<IFoo>(new Foo());
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+                .And.Message.Should().Be("No dependency found of type FluentArrange.Tests.TestClasses.IFoo");
+        }
+
+        [Fact]
+        public void WithDependency_T2_T3_InstanceTypeFound_ShouldInvokeAction()
+        {
+            // Arrange
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+            var invoked = false;
+
+            // Act
+            sut.WithDependency<IAccountRepository, AccountRepository>(new AccountRepository(), repository => invoked = true);
+
+            // Assert
+            invoked.Should().BeTrue();
+        }
+
+        [Fact]
+        public void WithDependency_T2_T3_InstanceTypeFound_DependenciesShouldContainInstance()
+        {
+            // Arrange
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+            var instance = new AccountRepository();
+
+            // Act
+            sut.WithDependency<IAccountRepository, AccountRepository>(instance, repository => { });
+
+            // Assert
+            sut.Dependencies[typeof(IAccountRepository)].Should().Be(instance);
         }
 
         [Fact]
@@ -74,45 +153,6 @@ namespace FluentArrange.Tests
 
             // Assert
             result.AccountRepository.Should().Be(dependency);
-        }
-
-        [Fact]
-        public void WithDependency_Instance_DependenciesShouldContainInstance()
-        {
-            // Arrange
-            var dependencies = new Dictionary<Type, object>
-            {
-                {typeof(IAccountRepository), new AccountRepository()}
-            };
-
-            var sut = new FluentArrangeContext<AccountService>(dependencies);
-
-            var newInstance = new AccountRepository();
-
-            // Act
-            sut.WithDependency<IAccountRepository>(newInstance);
-
-            // Assert
-            sut.Dependencies[typeof(IAccountRepository)].Should().Be(newInstance);
-        }
-
-        [Fact]
-        public void WithDependency_Instance_TypeNotFound_ShouldThrowInvalidOperationException()
-        {
-            // Arrange
-            var dependencies = new Dictionary<Type, object>
-            {
-                {typeof(IAccountRepository), new AccountRepository()}
-            };
-
-            var sut = new FluentArrangeContext<AccountService>(dependencies);
-
-            // Act
-            Action act = () => sut.WithDependency<IFoo>(new Foo());
-
-            // Assert
-            act.Should().Throw<InvalidOperationException>()
-                .And.Message.Should().Be("No dependency found of type FluentArrange.Tests.TestClasses.IFoo");
         }
     }
 }
