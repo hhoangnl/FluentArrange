@@ -21,7 +21,8 @@ namespace FluentArrange
 
         public T Sut => _sut ??= BuildSut();
 
-        public FluentArrangeContext<T> WithDependency<T2>(Action<T2> configureDependency) where T2 : class
+        public FluentArrangeContext<T> WithDependency<T2>(Action<T2> configureDependency)
+            where T2 : class
         {
             if (Dependencies.TryGetValue(typeof(T2), out var value) && value is T2 dependency)
             {
@@ -31,7 +32,8 @@ namespace FluentArrange
             return this;
         }
 
-        public FluentArrangeContext<T> WithDependency<T2>(T2 instance) where T2 : class
+        public FluentArrangeContext<T> WithDependency<T2>(T2 instance)
+            where T2 : class
         {
             _ = Dependency<T2>();
 
@@ -40,7 +42,20 @@ namespace FluentArrange
             return this;
         }
 
-        public FluentArrangeContext<T> WithDependency<T2>(T2 instance, Action<T2> configureInstance) where T2 : class
+        public FluentArrangeContext<T> WithDependency<T2>(T2 instance, Action<T2> configureInstance)
+            where T2 : class
+        {
+            _ = Dependency<T2>();
+
+            Dependencies[typeof(T2)] = instance;
+            configureInstance(instance);
+
+            return this;
+        }
+
+        public FluentArrangeContext<T> WithDependency<T2, T3>(T3 instance, Action<T3> configureInstance)
+            where T2 : class
+            where T3 : T2
         {
             _ = Dependency<T2>();
 

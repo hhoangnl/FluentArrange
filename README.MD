@@ -68,6 +68,15 @@ var context = Arrange.Sut<ResetPasswordController>()
     });
 ~~~
 
+or `WithDependency<T, T2>(T2, Action<T2>)` if you need to call `T2`-specific methods:
+~~~ C#
+var context = Arrange.Sut<ResetPasswordController>()
+    .WithDependency<IAccountService, InMemoryAccountService>(new InMemoryAccountService(), d =>
+    {
+        d.AddTestAccounts();
+    });
+~~~
+
 ## Asserting Dependencies
 Suppose you need to assert that a dependency's method has been called.
 Well, you simply arrange code with `Arrange.For<T>` instead of `Arrange.Sut<T>` to get a `FluentArrangeContext` object:
