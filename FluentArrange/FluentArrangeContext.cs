@@ -75,6 +75,19 @@ namespace FluentArrange
             throw new InvalidOperationException($"No dependency found of type {typeof(T2)}");
         }
 
+        public T3 Dependency<T2, T3>()
+            where T2 : class
+            where T3 : T2
+        {
+            var dependency = Dependency<T2>();
+            if (dependency.GetType() == typeof(T3))
+            {
+                return (T3) dependency;
+            }
+
+            throw new InvalidOperationException($"The found dependency is of type '{dependency.GetType()}' but type '{typeof(T3)}' was expected");
+        }
+
         public T BuildSut()
         {
             return (T) Activator
