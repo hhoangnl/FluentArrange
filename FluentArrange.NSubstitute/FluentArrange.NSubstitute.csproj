@@ -3,16 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>0.3.0-alpha</Version>
+    <Version>0.4.0-alpha</Version>
     <Description>FluentArrange using NSubstitute as mocking framework.</Description>
     <PackageProjectUrl>https://github.com/hhoangnl/FluentArrange</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hhoangnl/FluentArrange</RepositoryUrl>
-    <PackageReleaseNotes>Added overload to configure and call T2-specific methods:
-- WithDependency&lt;T, T2&gt;(T2, Action&lt;T2&gt;)</PackageReleaseNotes>
+    <PackageReleaseNotes>Added overload to return a concrete implementation T2 of type T for assertion purposes:
+- T2 Dependency&lt;T, T2&gt;()</PackageReleaseNotes>
     <PackageTags>AAA TDD mocking unit-testing nsubstitute</PackageTags>
     <Authors>Huy Hoang</Authors>
     <Copyright>Huy Hoang</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>packageicon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,13 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>FluentArrange.NSubstitute.Tests</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\packageicon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

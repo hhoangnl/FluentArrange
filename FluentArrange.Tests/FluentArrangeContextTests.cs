@@ -136,6 +136,60 @@ namespace FluentArrange.Tests
         }
 
         [Fact]
+        public void Dependency_T2_DependencyTypeNotFound_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var sut = new FluentArrangeContext<AccountRepository>(new Dictionary<Type, object>());
+
+            // Act
+            Action act = () => sut.Dependency<IFoo>();
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+                .And.Message.Should().Be("No dependency found of type FluentArrange.Tests.TestClasses.IFoo");
+        }
+
+        [Fact]
+        public void Dependency_T2_T3_DifferentTypeExpected_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var expectedErrorMessage = $"The found dependency is of type '{typeof(AccountRepository)}' but type '{typeof(YetAnotherAccountRepository)}' was expected";
+
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), new AccountRepository()}
+            };
+
+            var sut = new FluentArrangeContext<AccountRepository>(dependencies);
+
+            // Act
+            Action act = () => sut.Dependency<IAccountRepository, YetAnotherAccountRepository>();
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>().And.Message.Should().Be(expectedErrorMessage);
+        }
+
+        [Fact]
+        public void Dependency_T2_T3_TypeFound_ShouldReturnT3()
+        {
+            // Arrange
+            var dependency = new AccountRepository();
+
+            var dependencies = new Dictionary<Type, object>
+            {
+                {typeof(IAccountRepository), dependency}
+            };
+
+            var sut = new FluentArrangeContext<AccountRepository>(dependencies);
+
+            // Act
+            var result = sut.Dependency<IAccountRepository, AccountRepository>();
+
+            // Assert
+            result.Should().Be(dependency);
+        }
+
+        [Fact]
         public void BuildSut_DependencyContainsInstance_BuiltSutShouldContainDependencyInstance()
         {
             // Arrange

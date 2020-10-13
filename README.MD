@@ -1,5 +1,10 @@
-# FluentArrange
-FluentArrange lets you write clean Arrange blocks in your unit tests when the constructor of the _class under test_ has a lot of (mocked) dependencies.
+<div align="center">
+    <img alt="dotnet-dash" src="logo.png" width="33%" />
+</div>
+
+<hr />
+
+**FluentArrange** lets you write clean Arrange blocks in your unit tests when the constructor of the _class under test_ has a lot of (mocked) dependencies.
 
 ## Packages
 | Package                     | Version | Description                                                             |
@@ -93,6 +98,11 @@ var sut = context.Sut;
 To get the Dependency, simply call `Dependency<T>`:
 ~~~
 context.Dependency<IAccountService>();
+~~~
+
+**or** `Dependency<T, T2>` to get access to `T2` and its specific methods:
+~~~
+context.Dependency<IAccountService, AccountService>();
 ~~~
 
 When used together, a unit test could look like this:
