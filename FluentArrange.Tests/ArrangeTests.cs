@@ -44,7 +44,7 @@ namespace FluentArrange.Tests
         }
 
         [Fact]
-        public void Sut_Func_ShouldReturnFuncResult()
+        public void Sut_Func_ShouldReturnDependency()
         {
             // Arrange
             var dependency = new AccountRepository();
@@ -54,6 +54,33 @@ namespace FluentArrange.Tests
 
             // Assert
             result.AccountRepository.Should().Be(dependency);
+        }
+
+        [Fact]
+        public void Sut_Func_Action_ShouldReturnDependency()
+        {
+            // Arrange
+            var dependency = new AccountRepository();
+
+            // Act
+            var result = Arrange.Sut<AccountService>(type => dependency, action => { });
+
+            // Assert
+            result.AccountRepository.Should().Be(dependency);
+        }
+
+        [Fact]
+        public void Sut_Func_Action_ShouldInvokeAction()
+        {
+            // Arrange
+            var dependency = new AccountRepository();
+            var invoked = false;
+
+            // Act
+            _ = Arrange.Sut<AccountService>(type => dependency, action => invoked = true);
+
+            // Assert
+            invoked.Should().BeTrue();
         }
     }
 }

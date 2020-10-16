@@ -33,5 +33,18 @@ namespace FluentArrange.NSubstitute.Tests
             // Assert
             result.GetType().FullName.Should().Be("Castle.Proxies.ObjectProxy");
         }
+
+        [Fact]
+        public void Sut_Action_ShouldInvokeAction()
+        {
+            // Arrange
+            var invoked = false;
+
+            // Act
+            _ = Arrange.Sut<AccountService>(service => invoked = true);
+
+            // Assert
+            invoked.Should().BeTrue();
+        }
     }
 }

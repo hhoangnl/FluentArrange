@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentArrange", "FluentArra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentArrange.NSubstitute", "FluentArrange.NSubstitute\FluentArrange.NSubstitute.csproj", "{D517B6B2-3711-41D9-A770-D172676DA8FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentArrange.NSubstitute.Tests", "FluentArrange.NSubstitute.Tests\FluentArrange.NSubstitute.Tests.csproj", "{0992C08A-DB10-4EF6-926A-051AF708E8F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentArrange.NSubstitute.Tests", "FluentArrange.NSubstitute.Tests\FluentArrange.NSubstitute.Tests.csproj", "{0992C08A-DB10-4EF6-926A-051AF708E8F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentArrange.Tests", "FluentArrange.Tests\FluentArrange.Tests.csproj", "{584B3837-FFEA-46EA-BE36-FDC99B69AC51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentArrange.Tests", "FluentArrange.Tests\FluentArrange.Tests.csproj", "{584B3837-FFEA-46EA-BE36-FDC99B69AC51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
