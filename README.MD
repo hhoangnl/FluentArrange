@@ -45,7 +45,7 @@ var sut = new ResetPasswordController(
 
 With FluentArrange, you can use the Fluent API `WithDependency<T>` to achieve the exact same result as the code above:
 ~~~ C#
-var sut = Arrange.Sut<ResetPasswordController>()
+var sut = Arrange.For<ResetPasswordController>()
     .WithDependency<IAccountService>(x => x.FindEmail("foo@foo.com").Returns(new Account("foo")))
     .WithDependency<IMailService>(x => x.SendMail("foo@foo.com").Returns(true));
 ~~~
@@ -59,13 +59,13 @@ Sometimes, you may want to use a fake implementation rather than letting FluentA
 In that case, you can provide an instance using `WithDependency<T>(T)`:
 
 ~~~ C#
-var context = Arrange.Sut<ResetPasswordController>()
+var context = Arrange.For<ResetPasswordController>()
     .WithDependency<IAccountService>(new InMemoryAccountService());
 ~~~
 
 or `WithDependency<T>(T, Action<T>)` if you need to do more arranging:
 ~~~ C#
-var context = Arrange.Sut<ResetPasswordController>()
+var context = Arrange.For<ResetPasswordController>()
     .WithDependency<IAccountService>(new InMemoryAccountService(), d =>
     {
         d.AddAccount("foo", "foo@foo.com");
@@ -75,7 +75,7 @@ var context = Arrange.Sut<ResetPasswordController>()
 
 or `WithDependency<T, T2>(T2, Action<T2>)` if you need to call `T2`-specific methods:
 ~~~ C#
-var context = Arrange.Sut<ResetPasswordController>()
+var context = Arrange.For<ResetPasswordController>()
     .WithDependency<IAccountService, InMemoryAccountService>(new InMemoryAccountService(), d =>
     {
         d.AddTestAccounts();
