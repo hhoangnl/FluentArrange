@@ -20,6 +20,12 @@ namespace FluentArrange.NSubstitute
             return FluentArrange.Arrange.Sut<T>(CreateMock);
         }
 
+        public static T Sut<T>(Action<T> arrangeSut)
+            where T : class
+        {
+            return FluentArrange.Arrange.Sut<T>(CreateMock, arrangeSut);
+        }
+
         internal static object CreateMock(Type type)
         {
             return Substitute.For(new[] {type}, new object[] { });

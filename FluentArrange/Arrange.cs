@@ -34,7 +34,17 @@ namespace FluentArrange
         public static T Sut<T>(Func<Type, object> createMockType)
             where T : class
         {
-            return For<T>(createMockType).BuildSut();
+            return Sut<T>(createMockType, null);
+        }
+
+        public static T Sut<T>(Func<Type, object> createMockType, Action<T>? arrangeSut)
+            where T : class
+        {
+            var result = For<T>(createMockType).BuildSut();
+
+            arrangeSut?.Invoke(result);
+
+            return result;
         }
     }
 }
