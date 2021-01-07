@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace FluentArrange
 {
@@ -18,7 +19,7 @@ namespace FluentArrange
         public static FluentArrangeContext<T> For<T>(Func<Type, object> createMockType)
             where T : class
         {
-            var constructor = typeof(T).GetConstructors().Single();
+            var constructor = typeof(T).GetTypeInfo().DeclaredConstructors.Single();
 
             var listOfDependencies = new Dictionary<Type, object>();
 
