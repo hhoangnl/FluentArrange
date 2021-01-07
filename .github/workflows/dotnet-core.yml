@@ -3,6 +3,7 @@ name: Build, Test and Release
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     NUGET_URL: https://api.nuget.org/v3/index.json
+    ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 on:
   push:
