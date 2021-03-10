@@ -32,6 +32,15 @@ namespace FluentArrange
             return this;
         }
 
+        public FluentArrangeContext<T> WithDependency<T2>(Action<FluentArrangeContext<T>, T2> configureDependency)
+	        where T2 : class
+        {
+	        return WithDependency<T2>(dependency =>
+	        {
+		        configureDependency.Invoke(this, dependency);
+	        });
+        }
+
         public FluentArrangeContext<T> WithDependency<T2>(T2 instance)
             where T2 : class
         {
@@ -63,6 +72,18 @@ namespace FluentArrange
             configureInstance(instance);
 
             return this;
+        }
+
+        public FluentArrangeContext<T> WithDependency<T2, T3>(T3 instance, Action<FluentArrangeContext<T>, T3> configureInstance)
+	        where T2 : class
+	        where T3 : T2
+        {
+	        _ = Dependency<T2>();
+
+	        Dependencies[typeof(T2)] = instance;
+	        configureInstance(this, instance);
+
+	        return this;
         }
 
         public T2 Dependency<T2>() where T2 : class

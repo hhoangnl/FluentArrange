@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentArrange.Tests.TestClasses;
 using FluentAssertions;
 using Xunit;
@@ -12,7 +13,7 @@ namespace FluentArrange.Tests
     public class FluentArrangeContextTests
     {
         [Fact]
-        public void WithDependency_TypeNotFound_ShouldNotInvokeAction()
+        public void WithDependency_T2_Action_T2_TypeNotFound_ShouldNotInvokeAction()
         {
             // Arrange
             var invoked = false;
@@ -26,25 +27,33 @@ namespace FluentArrange.Tests
         }
 
         [Fact]
-        public void WithDependency_TypeFound_ShouldInvokeAction()
+        public void WithDependency_T2_Action_T2_TypeFound_ShouldInvokeAction()
         {
             // Arrange
             var invoked = false;
+
             var dependencies = new Dictionary<Type, object>
             {
                 {typeof(IAccountRepository), new AccountRepository()}
             };
+
             var sut = new FluentArrangeContext<AccountService>(dependencies);
 
             // Act
-            sut.WithDependency<IAccountRepository>(e => invoked = true);
+            sut.WithDependency<IAccountRepository>(d =>
+            {
+                invoked = true;
+
+                // Assert
+                d.Should().Be(dependencies.Single().Value);
+            });
 
             // Assert
             invoked.Should().BeTrue();
         }
 
         [Fact]
-        public void WithDependency_Type_ShouldReturnReferenceToSut()
+        public void WithDependency_T2_Action_T2_Always_ShouldReturnReferenceToSut()
         {
             // Arrange
             var sut = new FluentArrangeContext<AccountService>(new Dictionary<Type, object>());
@@ -57,7 +66,7 @@ namespace FluentArrange.Tests
         }
 
         [Fact]
-        public void WithDependency_T_InstanceTypeFound_DependenciesShouldContainInstance()
+        public void WithDependency_T2_Instance_InstanceTypeFound_DependenciesShouldContainInstance()
         {
             // Arrange
             var dependencies = new Dictionary<Type, object>
@@ -77,7 +86,7 @@ namespace FluentArrange.Tests
         }
 
         [Fact]
-        public void WithDependency_T_InstanceTypeNotFound_ShouldThrowInvalidOperationException()
+        public void WithDependency_T2_Instance_InstanceTypeNotFound_ShouldThrowInvalidOperationException()
         {
             // Arrange
             var dependencies = new Dictionary<Type, object>
@@ -96,9 +105,38 @@ namespace FluentArrange.Tests
         }
 
         [Fact]
-        public void WithDependency_T2_T3_InstanceTypeFound_ShouldInvokeAction()
+        public void WithDependency_T2_Context_Instance_InstanceTypeFound_ShouldInvokeAction()
+        {
+	        // Arrange
+	        var invoked = false;
+
+	        var dependencies = new Dictionary<Type, object>
+	        {
+		        {typeof(IAccountRepository), new AccountRepository()}
+	        };
+
+	        var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+	        // Act
+            sut.WithDependency<IAccountRepository>((context, repository) =>
+            {
+	            invoked = true;
+
+                // Assert
+                context.Should().Be(sut);
+	            repository.Should().Be(dependencies.Single().Value);
+            });
+
+            // Assert
+            invoked.Should().BeTrue();
+        }
+
+        [Fact]
+        public void WithDependency_T2_T3_Instance_Action_InstanceTypeFound_ShouldInvokeActionWithInstance()
         {
             // Arrange
+            var invoked = false;
+
             var dependencies = new Dictionary<Type, object>
             {
                 {typeof(IAccountRepository), new AccountRepository()}
@@ -106,17 +144,52 @@ namespace FluentArrange.Tests
 
             var sut = new FluentArrangeContext<AccountService>(dependencies);
 
-            var invoked = false;
+            var instance = new AccountRepository();
 
             // Act
-            sut.WithDependency<IAccountRepository, AccountRepository>(new AccountRepository(), repository => invoked = true);
+            sut.WithDependency<IAccountRepository, AccountRepository>(instance, repository =>
+            {
+	            invoked = true;
+
+                // Assert
+                repository.Should().Be(instance);
+            });
 
             // Assert
             invoked.Should().BeTrue();
         }
 
         [Fact]
-        public void WithDependency_T2_T3_InstanceTypeFound_DependenciesShouldContainInstance()
+        public void WithDependency_T2_T3_Instance_ActionWithContext_InstanceTypeFound_ShouldInvokeActionWithInstanceAndContext()
+        {
+            // Arrange
+            var invoked = false;
+
+            var dependencies = new Dictionary<Type, object>
+	        {
+		        {typeof(IAccountRepository), new AccountRepository()}
+	        };
+
+	        var sut = new FluentArrangeContext<AccountService>(dependencies);
+
+	        var instance = new AccountRepository();
+
+	        // Act
+	        sut.WithDependency<IAccountRepository, AccountRepository>(instance, (context, repository) =>
+	        {
+	            invoked = true;
+
+	            // Assert
+                context.Should().Be(sut);
+		        repository.Should().Be(instance);
+	        });
+
+	        // Assert
+	        invoked.Should().BeTrue();
+        }
+
+        [Fact]
+        public void WithDependency_T2_T3_Instance_Action_InstanceTypeFound_DependenciesShouldContainInstance()
         {
             // Arrange
             var dependencies = new Dictionary<Type, object>
