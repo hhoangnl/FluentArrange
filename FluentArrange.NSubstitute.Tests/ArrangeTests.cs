@@ -41,7 +41,7 @@ namespace FluentArrange.NSubstitute.Tests
             var invoked = false;
 
             // Act
-            _ = Arrange.Sut<AccountService>(service => invoked = true);
+            _ = Arrange.Sut<AccountService>(_ => invoked = true);
 
             // Assert
             invoked.Should().BeTrue();

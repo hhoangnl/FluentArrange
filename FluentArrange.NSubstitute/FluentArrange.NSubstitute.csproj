@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>0.7.0-alpha</Version>
+    <Version>0.8</Version>
     <Description>FluentArrange using NSubstitute as mocking framework.</Description>
     <PackageProjectUrl>https://github.com/hhoangnl/FluentArrange</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hhoangnl/FluentArrange</RepositoryUrl>
-    <PackageReleaseNotes>Add a new signature for `WithDependency{T2}` to inject a `FluentArrangeContext{T}` into an Action</PackageReleaseNotes>
+    <PackageReleaseNotes>Added extension methods `Returns{T}(Action{T})` for cleaner arrange code.</PackageReleaseNotes>
     <PackageTags>AAA TDD mocking unit-testing nsubstitute</PackageTags>
     <Authors>Huy Hoang</Authors>
     <Copyright>Huy Hoang</Copyright>
