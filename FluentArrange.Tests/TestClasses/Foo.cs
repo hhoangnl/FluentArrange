@@ -5,5 +5,6 @@ namespace FluentArrange.Tests.TestClasses
 {
     public class Foo : IFoo
     {
+        public int Id { get; set; }
     }
 }
