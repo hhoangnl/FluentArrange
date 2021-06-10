@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>0.9</Version>
+    <Version>0.10</Version>
     <Description>Write clean Arrange code using Fluent syntax.</Description>
     <PackageProjectUrl>https://github.com/hhoangnl/FluentArrange</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hhoangnl/FluentArrange</RepositoryUrl>
-    <PackageReleaseNotes>Added extension methods `Init{T}(Action{T})` for cleaner arrange code.</PackageReleaseNotes>
+    <PackageReleaseNotes>Removed obsolete method</PackageReleaseNotes>
     <PackageTags>AAA TDD mocking unit-testing</PackageTags>
     <Authors>Huy Hoang</Authors>
     <Copyright>Huy Hoang</Copyright>
