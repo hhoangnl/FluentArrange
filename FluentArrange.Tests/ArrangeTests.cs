@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Huy Hoang. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using System;
+using System.Linq;
 using FluentArrange.Tests.TestClasses;
 using FluentAssertions;
 using Xunit;
@@ -11,20 +11,30 @@ namespace FluentArrange.Tests
     public class ArrangeTests
     {
         [Fact]
-        public void For_MultipleCtorsFound_ShouldThrowInvalidOperationException()
+        public void For_MultipleCtorsFound_ShouldPickFirst()
         {
             // Act
-            Action act = () => Arrange.For<MultipleCtor>(type => new object());
+            var sut = Arrange.For<MultipleCtor>(_ => new object());
 
             // Assert
-            act.Should().Throw<InvalidOperationException>();
+            sut.Sut.CtorUsed.Should().Be(1);
+        }
+
+        [Fact]
+        public void For_PickSpecificCtor_ShouldUse()
+        {
+            // Act
+            var sut = Arrange.For<MultipleCtor>(_ => new Foo(), constructors => constructors.Last());
+
+            // Assert
+            sut.Sut.CtorUsed.Should().Be(2);
         }
 
         [Fact]
         public void For_ParameterlessCtor_ShouldNotHaveAnyDependencies()
         {
             // Act
-            var result = Arrange.For<AccountRepository>(type => new object());
+            var result = Arrange.For<AccountRepository>(_ => new object());
 
             // Assert
             result.Dependencies.Should().BeEmpty();
@@ -37,7 +47,7 @@ namespace FluentArrange.Tests
             var dependency = new AccountRepository();
 
             // Act
-            var result = Arrange.For<AccountService>(type => dependency);
+            var result = Arrange.For<AccountService>(_ => dependency);
 
             // Assert
             result.Dependencies.Values.Should().SatisfyRespectively(first => first.Should().Be(dependency));
@@ -50,7 +60,7 @@ namespace FluentArrange.Tests
             var dependency = new AccountRepository();
 
             // Act
-            var result = Arrange.Sut<AccountService>(type => dependency);
+            var result = Arrange.Sut<AccountService>(_ => dependency);
 
             // Assert
             result.AccountRepository.Should().Be(dependency);
@@ -63,7 +73,7 @@ namespace FluentArrange.Tests
             var dependency = new AccountRepository();
 
             // Act
-            var result = Arrange.Sut<AccountService>(type => dependency, action => { });
+            var result = Arrange.Sut<AccountService>(_ => dependency, action => { });
 
             // Assert
             result.AccountRepository.Should().Be(dependency);
@@ -77,7 +87,7 @@ namespace FluentArrange.Tests
             var invoked = false;
 
             // Act
-            _ = Arrange.Sut<AccountService>(type => dependency, action => invoked = true);
+            _ = Arrange.Sut<AccountService>(_ => dependency, action => invoked = true);
 
             // Assert
             invoked.Should().BeTrue();

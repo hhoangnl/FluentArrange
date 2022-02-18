@@ -5,12 +5,16 @@ namespace FluentArrange.Tests.TestClasses
 {
     public class MultipleCtor
     {
+        public int CtorUsed { get; }
+
         public MultipleCtor()
         {
+            CtorUsed = 1;
         }
 
         public MultipleCtor(IFoo foo)
         {
+            CtorUsed = 2;
         }
     }
 }
