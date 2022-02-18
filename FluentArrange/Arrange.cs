@@ -11,16 +11,33 @@ namespace FluentArrange
     public static class Arrange
     {
         /// <summary>
+        /// Construct a class of type {T} (using the first public constructor) and inject it with mocked dependencies.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="createMockType"></param>
+        /// <returns></returns>
+        public static FluentArrangeContext<T> For<T>(Func<Type, object> createMockType)
+            where T : class
+        {
+            return For<T>(createMockType, constructors => constructors.FirstOrDefault(c => c.IsPublic));
+        }
+
+        /// <summary>
         /// Construct a class of type {T} and inject it with mocked dependencies.
         /// </summary>
         /// <typeparam name="T">Type of the concrete class</typeparam>
         /// <param name="createMockType">The method to create mocked dependencies</param>
+        /// <param name="constructorSelector">Pick a specific constructor for instantiation</param>
         /// <returns>An instance of {T}</returns>
-        public static FluentArrangeContext<T> For<T>(Func<Type, object> createMockType)
+        public static FluentArrangeContext<T> For<T>(Func<Type, object> createMockType, Func<IEnumerable<ConstructorInfo>, ConstructorInfo?> constructorSelector)
             where T : class
         {
-            var constructor = typeof(T).GetTypeInfo().DeclaredConstructors.Single();
-
+            var constructor = constructorSelector.Invoke(typeof(T).GetTypeInfo().DeclaredConstructors);
+            if (constructor == null)
+            {
+                throw new InvalidOperationException("No matching constructor found.");
+            }
+            
             var listOfDependencies = new Dictionary<Type, object>();
 
             foreach (var p in constructor.GetParameters())
